@@ -2,6 +2,10 @@ name: Deploy sandbox
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+      - test-2
 
 permissions:
   contents: read
