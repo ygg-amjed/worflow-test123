@@ -1,0 +1,39 @@
+name: Workflow governance
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/**
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  block-new-workflows:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Block newly added workflow files
+        run: |
+          git fetch origin "${GITHUB_BASE_REF}" --depth=1
+
+          allowed_new_workflow=".github/workflows/workflow-governance.yaml"
+          added_workflows="$(git diff --name-status "origin/${GITHUB_BASE_REF}"..."${GITHUB_SHA}" | awk '$1 == "A" && $2 ~ /^\.github\/workflows\/.*\.ya?ml$/ { print $2 }')"
+          blocked_workflows="$(echo "${added_workflows}" | awk -v allow="${allowed_new_workflow}" 'NF && $0 != allow { print $0 }')"
+
+          if [ -n "${blocked_workflows}" ]; then
+            echo "ERROR: Creating new workflow files is blocked."
+            echo "New workflow files found:"
+            echo "${blocked_workflows}"
+            exit 1
+          fi
+
+          echo "No new workflow files were added."

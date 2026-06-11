@@ -1,0 +1,2 @@
+# Require explicit owner review for all GitHub workflow changes.
+/.github/workflows/ @ygg-amjed
