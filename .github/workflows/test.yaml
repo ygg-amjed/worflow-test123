@@ -1,0 +1,23 @@
+name: Test workflow
+on:
+  workflow_dispatch:
+
+
+permissions:
+  contents: read
+
+jobs:
+
+  deploy:
+    runs-on: ubuntu-latest
+
+    environment:
+      name: Configure QA
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy
+        run: |
+          echo "Deploying to QA from main branch..."
